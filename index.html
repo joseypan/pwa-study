@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="theme-color" content="#4374A5" />
+    <link rel="manifest" href="./manifest.json" />
+    <title>pwa test</title>
+  </head>
+  <body>
+    <div>hello world</div>
+    <button id="installBtn">安装应用</button>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("./sw.js");
+        });
+        let appPromptEvent = null;
+        window.addEventListener("beforeinstallprompt", (event) => {
+          console.log("触发事件：beforeinstallprompt");
+          appPromptEvent = event;
+          event.preventDefault();
+          return false;
+        });
+        const installBtn = document.getElementById("installBtn");
+        installBtn.addEventListener("click", () => {
+          if (appPromptEvent !== null) {
+            appPromptEvent.prompt();
+            appPromptEvent.userChoice.then((result) => {
+              if (result.outcont === "accepted") {
+                console.log("同意安装");
+              } else {
+                console.log("不同意安装应用");
+              }
+              appPromptEvent = null;
+            });
+          }
+        });
+        window.addEventListener("appinstalled", function () {
+          console.log("应用已安装");
+        });
+      }
+    </script>
+  </body>
+</html>
